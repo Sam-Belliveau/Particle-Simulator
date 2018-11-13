@@ -5,13 +5,13 @@
 int main()
 {
 	printf("Controls:\n");
-	printf("	Mouse - Move Particles\n\n");
+	printf("	Mouse - Move Particals\n\n");
 	printf("	Arrows - Move\n\n");
 	printf("	W - Zoom In\n");
 	printf("	S - Zoom Out\n\n\n");
 
-	printf("Particles: %ul\n", amount);
-	printf("Square Width/Height: %ul\n", sqrtAmount);
+	printf("Particles: %i\n", amount);
+	printf("Square Width/Height: %i\n", sqrtAmount);
 
 	sf::ContextSettings set;
 	set.antialiasingLevel = 16;

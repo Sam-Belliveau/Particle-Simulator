@@ -8,70 +8,77 @@
 #include <vector>
 #include <cmath>
 
+// Camera position and zoom information
 struct Camera
 {
   sf::Vector2f offSet = sf::Vector2f(0.f, 0.f);
   float zoom = 3;
 };
 
+// Partical Data before being turned into a vertex
 struct VertexData
 {
   sf::Vector2f vel = sf::Vector2f(0.f, 0.f);
   sf::Vector2f pos = sf::Vector2f(0.f, 0.f);
 };
 
+// Group Of Vertexs, Camera, and SFML Group
 class Group
 {
 public:
   Group()
   {
+    // Make particle array
     std::vector<VertexData> temp(amount);
     point.swap(temp);
     reset();
   }
 
-  void drawUpdate(sf::RenderWindow& win, float& fps)
+  void drawUpdate(sf::RenderWindow& win, const float fps)
   {
+    // Loop through particles
   	for(std::size_t i = 0; i < amount; i++)
   	{
+      // Calculate velosity based on FPS
       point[i].pos.x += point[i].vel.x/fps;
       point[i].pos.y += point[i].vel.y/fps;
 
-      draw[i].position.x = (point[i].pos.x + cam.offSet.x) / cam.zoom + width/2;
-      draw[i].position.y = (point[i].pos.y + cam.offSet.y) / cam.zoom + height/2;
+      // Turn particle information into a spot on the screen
+      draw[i].position.x = particleToScreen(point[i].pos.x, cam.offSet.x, width);
+      draw[i].position.y = particleToScreen(point[i].pos.y, cam.offSet.y, height);
   	}
-  	win.draw(draw);
-  }
 
-  inline float formula(const float force, const float distance,
-                       const float xDis, const float yDis)
-  {
-    return ((force / distance) * std::abs(xDis)) /
-            (std::abs(yDis) + std::abs(xDis));
+    // Draw particles
+  	win.draw(draw);
   }
 
   void updateMouse(const sf::Vector2i mouse, const bool neg)
   {
   	for(VertexData& p : point)
   	{
-      float xDis = p.pos.x - (mouse.x - width/2)*cam.zoom - cam.offSet.x;
-      float yDis = p.pos.y - (mouse.y - height/2)*cam.zoom - cam.offSet.y;
+      // Take the distance between particle pos and mouse position per axis.
+      float xDis = p.pos.x - screenToParticle(mouse.x, cam.offSet.x, width);
+      float yDis = p.pos.y - screenToParticle(mouse.y, cam.offSet.y, height);
 
-           if(xDis < 0 && xDis > -min*cam.zoom) { xDis = -min*cam.zoom; }
-      else if(xDis >= 0 && xDis < min*cam.zoom) { xDis = min*cam.zoom; }
+      // Handle division by 0 like stuff
+           if(xDis < 0 && xDis > -min) { xDis = -min*cam.zoom; }
+      else if(xDis >= 0 && xDis < min) { xDis =  min*cam.zoom; }
 
-           if(yDis < 0 && yDis > -min*cam.zoom) { yDis = -min*cam.zoom; }
-      else if(yDis >= 0 && yDis < min*cam.zoom) { yDis = min*cam.zoom; }
+           if(yDis < 0 && yDis > -min) { yDis = -min*cam.zoom; }
+      else if(yDis >= 0 && yDis < min) { yDis =  min*cam.zoom; }
 
+      // Take distance of particle to mouse
       const float distance = sqrtf((xDis*xDis) + (yDis*yDis)) / cam.zoom;
 
-      if(xDis > 0 ^ neg) p.vel.x -= formula(force, distance, xDis, yDis);
-                    else p.vel.x += formula(force, distance, xDis, yDis);
-      if(yDis > 0 ^ neg) p.vel.y -= formula(force, distance, yDis, xDis);
-                    else p.vel.y += formula(force, distance, yDis, xDis);
+      // Change velosity based on formula
+      if((xDis > 0) != neg) p.vel.x -= formula(force, distance, xDis, yDis);
+                       else p.vel.x += formula(force, distance, xDis, yDis);
+      if((yDis > 0) != neg) p.vel.y -= formula(force, distance, yDis, xDis);
+                       else p.vel.y += formula(force, distance, yDis, xDis);
   	}
   }
 
+  // Reset particle positions and velositys
   void reset()
   {
   	for(std::size_t i = 0; i < amount; ++i)
@@ -88,6 +95,24 @@ public:
   Camera cam;
   std::vector<VertexData> point;
   sf::VertexArray draw = sf::VertexArray(sf::Points, amount);
+
+private: // Helper functions
+  // Formula to turn particle positions into screen positions
+  float particleToScreen(const float in, const float c, const float d)
+  { return (in + c) / cam.zoom + d/2; }
+
+  // Formula to turn screen positions into particle positions
+  float screenToParticle(const float in, const float c, const float d)
+  { return (in - d/2) * cam.zoom - c; }
+
+  // Force formula
+  float formula(const float force, const float distance,
+                const float xDis, const float yDis)
+  {
+    return ((force / distance) * std::abs(xDis)) /
+            (std::abs(yDis) + std::abs(xDis));
+  }
+
 };
 
 #endif

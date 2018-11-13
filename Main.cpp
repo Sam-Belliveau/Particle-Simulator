@@ -5,42 +5,41 @@
 int main()
 {
 	printf("Controls:\n");
-	printf("	Mouse - Move Particals\n\n");
+	printf("	Mouse - Move Particles\n\n");
 	printf("	Arrows - Move\n\n");
 	printf("	W - Zoom In\n");
 	printf("	S - Zoom Out\n\n\n");
 
-	printf("Particals: %i\n", amount);
-	printf("Square Width/Height: %i\n", sqrtAmount);
+	printf("Particles: %ul\n", amount);
+	printf("Square Width/Height: %ul\n", sqrtAmount);
 
 	sf::ContextSettings set;
 	set.antialiasingLevel = 16;
 
-	sf::RenderWindow window(sf::VideoMode(width, height), "Particals", sf::Style::Close, set);
+	sf::RenderWindow window(sf::VideoMode(width, height), "Particles", sf::Style::Close, set);
 	Group par = Group();
 
 	sf::Clock clock;
-	float lastTime = 0;
 	float currentTime = clock.restart().asSeconds();
 	float fps = 1.f / currentTime;
 	while (window.isOpen())
 	{
 		sf::Event evnt;
 		while (window.pollEvent(evnt))
-            switch (evnt.type){ case sf::Event::Closed: window.close();	break; }
+      switch (evnt.type){ case sf::Event::Closed: window.close();	break; }
 
 		if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
 			par.updateMouse(sf::Mouse::getPosition(window), false);
 		if (sf::Mouse::isButtonPressed(sf::Mouse::Right))
 			par.updateMouse(sf::Mouse::getPosition(window), true);
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
-			par.cam.offSet.y += speed / fps;
+			par.cam.offSet.y += par.cam.zoom * speed / fps;
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
-			par.cam.offSet.y -= speed / fps;
+			par.cam.offSet.y -= par.cam.zoom * speed / fps;
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
-			par.cam.offSet.x += speed / fps;
+			par.cam.offSet.x += par.cam.zoom * speed / fps;
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
-			par.cam.offSet.x -= speed / fps;
+			par.cam.offSet.x -= par.cam.zoom * speed / fps;
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
 			par.cam.zoom *= 1.f + (zSpeed / fps);
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::W))

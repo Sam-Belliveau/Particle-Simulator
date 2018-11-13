@@ -4,10 +4,10 @@
 #include <SFML/Graphics.hpp>
 #include <cmath>
 
-const unsigned long amount = 768*768;
+const unsigned long amount = 1024*1024;
 
-const unsigned int width = 1280;
-const unsigned int height = 720;
+const unsigned int width = 1920;
+const unsigned int height = 1080;
 
 const unsigned long sqrtAmount = std::sqrt(amount);
 

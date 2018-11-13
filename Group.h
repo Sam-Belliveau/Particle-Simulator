@@ -37,8 +37,8 @@ public:
       point[i].pos.x += point[i].vel.x/fps;
       point[i].pos.y += point[i].vel.y/fps;
 
-      draw[i].position.x = point[i].pos.x / cam.zoom + cam.offSet.x + width/2;
-      draw[i].position.y = point[i].pos.y / cam.zoom + cam.offSet.y + height/2;
+      draw[i].position.x = (point[i].pos.x + cam.offSet.x) / cam.zoom + width/2;
+      draw[i].position.y = (point[i].pos.y + cam.offSet.y) / cam.zoom + height/2;
   	}
   	win.draw(draw);
   }
@@ -54,8 +54,8 @@ public:
   {
   	for(VertexData& p : point)
   	{
-      float xDis = p.pos.x - (mouse.x - cam.offSet.x - width/2)*cam.zoom;
-      float yDis = p.pos.y - (mouse.y - cam.offSet.y - height/2)*cam.zoom;
+      float xDis = p.pos.x - (mouse.x - width/2)*cam.zoom - cam.offSet.x;
+      float yDis = p.pos.y - (mouse.y - height/2)*cam.zoom - cam.offSet.y;
 
            if(xDis < 0 && xDis > -min*cam.zoom) { xDis = -min*cam.zoom; }
       else if(xDis >= 0 && xDis < min*cam.zoom) { xDis = min*cam.zoom; }
